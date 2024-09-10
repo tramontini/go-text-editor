@@ -53,14 +53,14 @@ func runEditor() {
 	screen, err := tcell.NewScreen()
 
 	if err != nil {
-		log.Fatalf("Erro ao iniciar a tela: %v", err)
+		log.Fatalf("errior while creating the screen: %v", err)
 	}
 	if err := screen.Init(); err != nil {
-		log.Fatalf("Erro ao inicializar a tela: %v", err)
+		log.Fatalf("error initializing screen: %v", err)
 	}
 	defer screen.Fini()
 
-	getFileValues("exemplo.txt")
+	getFileValues("text_file.txt")
 
 	_, height := screen.Size()
 	style := tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite)
@@ -94,7 +94,7 @@ func runEditor() {
 					CursorX -= 1
 				}
 			case tcell.KeyRight:
-				// Impedindo de ir além do que tem no vetor atual
+				// Preventing from going beyond the current vector's bounds
 				if CursorX < len(Content[CursorY]) {
 					CursorX += 1
 				}
@@ -110,7 +110,7 @@ func runEditor() {
 				insertMode = true
 				setFooter(height, screen, style)
 			case tcell.KeyCtrlS:
-				err := saveFile("exemplo.txt")
+				err := saveFile("text_file.txt")
 
 				if err != nil {
 					log.Fatal(err)
@@ -127,13 +127,13 @@ func runEditor() {
 					}
 
 					line := Content[CursorY]
-					// Verifica se o cursor vai estourar a posição dos caracteres
+					// Check if the cursor will exceed the character positions.
 					if CursorX < len(line) {
-						// Apendando caracter digitado no meio da linha a partir do que tudo que tinha antes e appendando o restante depois
-						// line[:CursorX] -> Valores na linha até onde estava o cursor
-						// []rune{event.Rune()} -> Colocando no vertor de rune o evento capturado
-						//  line[CursorX:] -> Adicionando o restante dos caracteres
-						// ... -> Nos appends significa pra adicionar tudo do slice 2 no slice 1
+						// Appending a typed character in the middle of the line by taking everything before it and appending the rest after
+						// line[:CursorX] -> Values in the line up to where the cursor was
+						// []rune{event.Rune()} -> Placing the captured event in a rune slice
+						// line[CursorX:] -> Adding the remaining characters
+						// ... -> In appends, it means to add all elements from slice 2 to slice 1
 						Content[CursorY] = append(line[:CursorX], append([]rune{event.Rune()}, line[CursorX:]...)...)
 					} else {
 						Content[CursorY] = append(line, event.Rune())
