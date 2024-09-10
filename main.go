@@ -12,6 +12,7 @@ import (
 var (
 	CursorX, CursorY int
 	Content          [][]rune
+	CursorXPosition  []int
 	insertMode       bool
 )
 
@@ -78,11 +79,15 @@ func runEditor() {
 			switch event.Key() {
 			case tcell.KeyUp:
 				if CursorY > 0 {
+					CursorXPosition[CursorY] = CursorX
 					CursorY -= 1
+					CursorX = CursorXPosition[CursorY]
 				}
 			case tcell.KeyDown:
 				if CursorY < len(Content)-1 {
+					CursorXPosition[CursorY] = CursorX
 					CursorY += 1
+					CursorX = CursorXPosition[CursorY]
 				}
 			case tcell.KeyLeft:
 				if CursorX > 0 {
@@ -112,6 +117,7 @@ func runEditor() {
 				}
 			case tcell.KeyEnter:
 				Content = append(Content, []rune{})
+				CursorXPosition = append(CursorXPosition, []int{0}...)
 				CursorY += 1
 				CursorX = 0
 			default:
@@ -154,6 +160,7 @@ func getFileValues(path string) {
 	for scanner.Scan() {
 		scanText := scanner.Text()
 		Content = append(Content, []rune(scanText))
+		CursorXPosition = append(CursorXPosition, []int{0}...)
 	}
 
 	if err := scanner.Err(); err != nil {
